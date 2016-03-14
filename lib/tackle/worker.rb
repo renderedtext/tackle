@@ -35,6 +35,7 @@ module Tackle
       begin
         tackle_log("Calling message processor...")
         block.call(payload)
+        puts delivery_info.delivery_tag
         @rabbit.channel.ack(delivery_info.delivery_tag)
         tackle_log("Successfully processed message")
       rescue Exception => ex

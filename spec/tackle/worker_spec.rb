@@ -47,23 +47,28 @@ describe Tackle::Worker do
 
     context "with exceptions" do
 
-      it "tries to process message two times" do
+      it "tries to process message, sends message to DLQ and gets it back to source queue" do
+        @worker.rabbit.queue.purge
         send_message
         sleep(2)
+        expect(@worker.rabbit.queue.message_count).to eql(1)
+
         delivery_info, properties, payload = @worker.rabbit.queue.pop
         execution_queue = []
-        processor = Proc.new { |body| execution_queue << body * 2; raise ArgumentError }
+        processor = Proc.new { |body| execution_queue << body * 2; raise Exception }
 
         @worker.process_message(delivery_info, properties, payload, processor)
         expect(execution_queue).to eql(["xx"])
-
-        sleep(2)
 
         @worker.connect
-        sleep(10)
-        delivery_info, properties, payload = @worker.rabbit.queue.pop
-        @worker.process_message(delivery_info, properties, payload, processor)
-        expect(execution_queue).to eql(["xx"])
+        expect(@worker.rabbit.queue.message_count).to eql(0)
+
+        sleep(1)
+        expect(@worker.rabbit.dead_letter_queue.message_count).to eql(1)
+
+        sleep(5)
+        expect(@worker.rabbit.dead_letter_queue.message_count).to eql(0)
+        expect(@worker.rabbit.queue.message_count).to eql(1)
       end
 
     end

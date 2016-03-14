@@ -1,4 +1,5 @@
 require "tackle/tackle_logger"
+require "byebug"
 
 module Tackle
 
@@ -16,8 +17,10 @@ module Tackle
     end
 
     def retry
-      @rabbit.channel.nack(@delivery_info.delivery_tag, false)
       tackle_log("Sending negative acknowledgement to source queue")
+      @rabbit.channel.nack(@delivery_info.delivery_tag)
+      sleep(1)
+      @rabbit.connect if !@rabbit.channel.open?
 
       if failure_count + 1 < @retry_limit
         tackle_log("Adding message to retry queue. Failure #{failure_count + 1}/#{@retry_limit}")
