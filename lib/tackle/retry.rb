@@ -1,6 +1,9 @@
+require "tackle/tackle_logger"
+
 module Tackle
 
   class Retry
+    include Tackle::TackleLogger
 
     def initialize(rabbit, delivery_info, properties, body, options)
       @rabbit = rabbit
@@ -8,17 +11,19 @@ module Tackle
       @properties = properties
       @body = body
       @options = options
+      @logger = options[:logger]
       @retry_limit = options[:retry_limit]
     end
 
     def retry
       @rabbit.channel.nack(@delivery_info.delivery_tag, false)
-      puts "nack message"
+      tackle_log("Sending negative acknowledgement to source queue")
 
-      if failure_count >= @retry_limit
-        puts "will not retry any more. Discarding message"
-      else
+      if failure_count + 1 < @retry_limit
+        tackle_log("Adding message to retry queue. Failure #{failure_count + 1}/#{@retry_limit}")
         @rabbit.dead_letter_queue.publish(@body, :headers => {:failure_count => failure_count + 1})
+      else
+        tackle_log("Reached #{failure_count + 1} failures. Discarding message.")
       end
     end
 

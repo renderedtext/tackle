@@ -3,10 +3,12 @@ require 'spec_helper'
 describe Tackle::Worker do
   class DummyWorker
     def initialize
+      logger = Logger.new(STDOUT)
       @worker = Tackle::Worker.new(:url => "localhost",
                                    :exchange => "test-exchange",
                                    :queue => "test-queue",
-                                   :retry_limit => 10)
+                                   :retry_limit => 10,
+                                   :logger => logger)
     end
 
     def run
