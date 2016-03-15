@@ -6,7 +6,14 @@ describe Tackle::DelayedRetry do
   let(:dead_letter_queue) { double("dead_letter_queue") }
   let(:properties) { double("properties", :headers => nil) }
   let(:payload) { double("payload") }
-  let(:options) { {:logger => logger, :retry_limit => 3} }
+
+  before do
+    @delayed_retry = Tackle::DelayedRetry.new(dead_letter_queue,
+                                              properties,
+                                              payload,
+                                              3,
+                                              logger)
+  end
 
   describe "schedule_retry" do
 
@@ -18,8 +25,7 @@ describe Tackle::DelayedRetry do
       it "pushes message onto dead letter queue" do
         expect(dead_letter_queue).to receive(:publish)
 
-        delayed_retry = Tackle::DelayedRetry.new(dead_letter_queue, properties, payload, options)
-        delayed_retry.schedule_retry
+        @delayed_retry.schedule_retry
       end
     end
 
@@ -31,8 +37,7 @@ describe Tackle::DelayedRetry do
       it "does nothing - discards the message" do
         expect(dead_letter_queue).not_to receive(:publish)
 
-        delayed_retry = Tackle::DelayedRetry.new(dead_letter_queue, properties, payload, options)
-        delayed_retry.schedule_retry
+        @delayed_retry.schedule_retry
       end
     end
 

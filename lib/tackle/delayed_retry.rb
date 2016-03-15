@@ -5,12 +5,12 @@ module Tackle
   class DelayedRetry
     include Tackle::TackleLogger
 
-    def initialize(dead_letter_queue, properties, payload, options)
+    def initialize(dead_letter_queue, properties, payload, retry_limit, logger)
       @dead_letter_queue = dead_letter_queue
       @properties = properties
       @payload = payload
-      @logger = options[:logger]
-      @retry_limit = options[:retry_limit]
+      @retry_limit = retry_limit
+      @logger = logger
     end
 
     def schedule_retry

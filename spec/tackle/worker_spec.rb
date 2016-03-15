@@ -20,12 +20,8 @@ describe Tackle::Worker do
 
   before do
     logger = Logger.new(STDOUT)
-    @worker = Tackle::Worker.new(:url => "localhost",
-                                 :exchange => "test-exchange",
-                                 :queue => "test-queue",
-                                 :retry_limit => 2,
-                                 :logger => logger)
-    @worker.connect
+    @worker = Tackle::Worker.new("test-exchange", "test-queue", :retry_limit => 2,
+                                                                :retry_delay => 5)
   end
 
   describe "#process_message" do

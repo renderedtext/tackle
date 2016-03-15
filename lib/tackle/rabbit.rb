@@ -8,15 +8,16 @@ module Tackle
 
     attr_reader :channel, :dead_letter_queue, :queue
 
-    def initialize(options)
-      @options = options
-      @exchange_name = options[:exchange]
-      @queue_name = options[:queue]
-      @logger = options[:logger]
+    def initialize(exchange_name, queue_name, amqp_url, retry_delay, logger)
+      @exchange_name = exchange_name
+      @queue_name = queue_name
+      @amqp_url = amqp_url
+      @retry_delay = retry_delay
+      @logger = logger
     end
 
     def connect
-      @conn = Bunny.new
+      @conn = Bunny.new(@amqp_url)
       @conn.start
       tackle_log("Connected to RabbitMQ")
 
@@ -50,7 +51,7 @@ module Tackle
       dead_letter_queue_name = "#{@exchange_name}_dead_letter_queue"
       @dead_letter_queue  = @channel.queue(dead_letter_queue_name, :durable => true,
                                           :arguments => {"x-dead-letter-exchange" => @exchange.name,
-                                                         "x-message-ttl" => 5000}).bind(dead_letter_exchange)
+                                                         "x-message-ttl" => @retry_delay}).bind(dead_letter_exchange)
       tackle_log("Connected to dead letter queue '#{dead_letter_queue_name}'")
     end
 
