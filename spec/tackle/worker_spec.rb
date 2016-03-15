@@ -32,6 +32,7 @@ describe Tackle::Worker do
     context "without exceptions" do
 
       it "processes message without retries" do
+        @worker.rabbit.queue.purge
         send_message("ab")
         sleep(1)
         delivery_info, properties, payload = @worker.rabbit.queue.pop

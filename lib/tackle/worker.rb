@@ -1,5 +1,5 @@
 require "tackle/rabbit"
-require "tackle/retry"
+require "tackle/delayed_retry"
 
 module Tackle
   class Worker
@@ -39,8 +39,12 @@ module Tackle
         tackle_log("Successfully processed message")
       rescue Exception => ex
         tackle_log("Failed to process message. Received exception '#{ex}'")
-        try_again = Tackle::Retry.new(@rabbit, delivery_info, properties, payload, @options)
-        try_again.retry
+        try_again = Tackle::DelayedRetry.new(@rabbit.dead_letter_queue,
+                                             properties,
+                                             payload,
+                                             @options)
+        try_again.schedule_retry
+        @rabbit.channel.nack(delivery_info.delivery_tag)
       end
     end
 
