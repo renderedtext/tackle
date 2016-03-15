@@ -20,7 +20,7 @@ module Tackle
       tackle_log("Sending negative acknowledgement to source queue")
       @rabbit.channel.nack(@delivery_info.delivery_tag)
 
-      if failure_count + 1 < @retry_limit
+      if failure_count + 1 <= @retry_limit
         tackle_log("Adding message to retry queue. Failure #{failure_count + 1}/#{@retry_limit}")
         @rabbit.dead_letter_queue.publish(@body, :headers => {:failure_count => failure_count + 1})
       else
