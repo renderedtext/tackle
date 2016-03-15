@@ -53,14 +53,13 @@ describe Tackle::Worker do
         sleep(2)
         expect(@worker.rabbit.queue.message_count).to eql(1)
 
-        delivery_info, properties, payload = @worker.rabbit.queue.pop
+        delivery_info, properties, payload = @worker.rabbit.queue.pop(:manual_ack => true)
         execution_queue = []
         processor = Proc.new { |body| execution_queue << body * 2; raise Exception }
 
         @worker.process_message(delivery_info, properties, payload, processor)
         expect(execution_queue).to eql(["xx"])
 
-        @worker.connect
         expect(@worker.rabbit.queue.message_count).to eql(0)
 
         sleep(1)
