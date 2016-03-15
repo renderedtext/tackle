@@ -1,32 +1,66 @@
 # Tackle
 
+
 [![Build Status](https://semaphoreci.com/api/v1/projects/b39e2ae2-2516-4fd7-9e2c-f5be1a043ff5/732979/badge.svg)](https://semaphoreci.com/renderedtext/tackle)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/tackle`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Tackles the problem of processing asynchronous jobs in reliable manner by relying on RabbitMQ.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'tackle'
+gem "tackle", :source => "https://gem.fury.io/renderedtext/"
 ```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install tackle
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require "tackle/worker"
+
+class ReliableWorker
+
+  def initialize
+    @worker = Tackle::Worker.new(:url => "localhost",
+                                 :exchange => "test-exchange",
+                                 :queue => "test-queue",
+                                 :retry_limit => 2,
+                                 :retry_delay => 15,
+                                 :logger => logger)
+  end
+
+  def run
+    @worker.perform { |message| process_message(message) }
+  end
+
+  def process_message(message)
+    # do something fun
+  end
+
+end
+```
+
+### How to run Tackle workers
+
+Perform method it block and wait for messages so you have to run each worker in it's own process.
+
+```ruby
+namespace :app do
+  desc "Processes messages realiably"
+  task :start_worker => :environment do
+    ReliableWorker.new.run
+  end
+end
+```
+
+Run your task with:
+
+```bash
+bundle exec rake app:start_worker
+```
 
 ## Development
+
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
