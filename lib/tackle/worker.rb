@@ -33,7 +33,12 @@ module Tackle
       @rabbit.connect
     end
 
-    def perform(&block)
+    # Subscribes for message deliveries
+    #
+    # @param [Block] Accepts a block that accepts message
+    #
+    # @api public
+    def subscribe(&block)
       tackle_log("Subscribing to queue...")
       rabbit.queue.subscribe(:manual_ack => true,
                              :block => true) do |delivery_info, properties, payload|

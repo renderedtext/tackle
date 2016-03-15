@@ -20,19 +20,18 @@ require "tackle/worker"
 class ReliableWorker
 
   def initialize
-    @worker = Tackle::Worker.new(:url => "localhost",
-                                 :exchange => "test-exchange",
-                                 :queue => "test-queue",
-                                 :retry_limit => 2,
-                                 :retry_delay => 15,
-                                 :logger => logger)
+    @worker = Tackle::Worker.new("test-exchange",
+                                 "test-queue", :url => "amqp://localhost:5672"
+                                               :retry_limit => 2,
+                                               :retry_delay => 15,
+                                               :logger => logger)
   end
 
   def run
-    @worker.perform { |message| process_message(message) }
+    @worker.subscribe { |message| perform(message) }
   end
 
-  def process_message(message)
+  def perform(message)
     # do something fun
   end
 
@@ -41,7 +40,7 @@ end
 
 ### How to run Tackle workers
 
-Perform method will block and wait for messages so you have to run each worker in it's own process.
+Subscribe call will block and wait for messages so you have to run each worker in it's own process.
 
 ```ruby
 namespace :app do
