@@ -1,6 +1,5 @@
 # Tackle
 
-
 [![Build Status](https://semaphoreci.com/api/v1/projects/b39e2ae2-2516-4fd7-9e2c-f5be1a043ff5/732979/badge.svg)](https://semaphoreci.com/renderedtext/tackle)
 
 Tackles the problem of processing asynchronous jobs in reliable manner by relying on RabbitMQ.
@@ -42,7 +41,7 @@ end
 
 ### How to run Tackle workers
 
-Perform method it block and wait for messages so you have to run each worker in it's own process.
+Perform method will block and wait for messages so you have to run each worker in it's own process.
 
 ```ruby
 namespace :app do
@@ -69,4 +68,5 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/tackle.
+
 
