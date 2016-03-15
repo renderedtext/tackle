@@ -44,7 +44,9 @@ module Tackle
                                              payload,
                                              @options)
         try_again.schedule_retry
+        tackle_log("Sending negative acknowledgement to source queue...")
         @rabbit.channel.nack(delivery_info.delivery_tag)
+        tackle_log("Negative acknowledgement sent")
       end
     end
 

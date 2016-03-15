@@ -14,8 +14,6 @@ module Tackle
     end
 
     def schedule_retry
-      tackle_log("Sending negative acknowledgement to source queue")
-
       if retry_count < @retry_limit
         tackle_log("Adding message to retry queue. Failure #{retry_count + 1}/#{@retry_limit}")
         @dead_letter_queue.publish(@payload, :headers => {:retry_count => retry_count + 1})
