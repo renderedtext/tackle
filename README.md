@@ -1,5 +1,7 @@
 # Tackle
 
+[![Build Status](https://semaphoreci.com/api/v1/projects/b39e2ae2-2516-4fd7-9e2c-f5be1a043ff5/732979/badge.svg)](https://semaphoreci.com/renderedtext/tackle)
+
 Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/tackle`. To experiment with that code, run `bin/console` for an interactive prompt.
 
 TODO: Delete this and the text above, and describe your gem
