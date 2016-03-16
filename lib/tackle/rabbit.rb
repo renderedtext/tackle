@@ -8,8 +8,9 @@ module Tackle
 
     attr_reader :channel, :dead_letter_queue, :queue
 
-    def initialize(exchange_name, queue_name, amqp_url, retry_delay, logger)
+    def initialize(exchange_name, routing_key, queue_name, amqp_url, retry_delay, logger)
       @exchange_name = exchange_name
+      @routing_key = routing_key
       @queue_name = queue_name
       @amqp_url = amqp_url
       @retry_delay = retry_delay
@@ -40,7 +41,7 @@ module Tackle
     def connect_queue
       @exchange = @channel.fanout(@exchange_name)
       tackle_log("Connected to exchange '#{@exchange_name}'")
-      @queue = @channel.queue(@queue_name, :durable => true).bind(@exchange)
+      @queue = @channel.queue(@queue_name, :durable => true).bind(@exchange, :routing_key => @routing_key)
       tackle_log("Connected to queue '#{@queue_name}'")
     end
 

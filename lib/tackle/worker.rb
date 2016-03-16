@@ -10,6 +10,7 @@ module Tackle
     # Initializes now worker
     #
     # @param [String] exchange_name Name of the exchange queue is connected to.
+    # @param [String] routing_key Routing key for binding queue to exchange
     # @param [String] queue_name Name of the queue worker is processing.
     # @param [Hash] options Worker options for RabbitMQ connection, retries and logger.
     #
@@ -19,13 +20,14 @@ module Tackle
     # @option options [Logger] :logger Logger instance. Defaults to standard output.
     #
     # @api public
-    def initialize(exchange_name, queue_name, options = {})
+    def initialize(exchange_name, routing_key, queue_name, options = {})
       @amqp_url = options[:url] || "amqp://localhost:5672"
       @retry_limit = options[:retry_limit] || 8
       @retry_delay = (options[:retry_delay] || 30) * 1000 #ms
       @logger = options[:logger] || Logger.new(STDOUT)
 
       @rabbit = Tackle::Rabbit.new(exchange_name,
+                                   routing_key,
                                    queue_name,
                                    @amqp_url,
                                    @retry_delay,

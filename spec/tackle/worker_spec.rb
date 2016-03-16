@@ -15,13 +15,13 @@ describe Tackle::Worker do
   def send_message(message)
     channel = conn.create_channel
     x = channel.fanout("test-exchange")
-    x.publish message
+    x.publish message, :routing_key => "test-routing-key"
   end
 
   before do
     logger = Logger.new(STDOUT)
-    @worker = Tackle::Worker.new("test-exchange", "test-queue", :retry_limit => 2,
-                                                                :retry_delay => 5)
+    @worker = Tackle::Worker.new("test-exchange", "test-routing-key", "test-queue", :retry_limit => 2,
+                                                                                    :retry_delay => 5)
   end
 
   describe "#process_message" do
