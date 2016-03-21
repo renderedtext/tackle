@@ -71,6 +71,8 @@ module Tackle
         tackle_log("Sending negative acknowledgement to source queue...")
         @rabbit.channel.nack(delivery_info.delivery_tag)
         tackle_log("Negative acknowledgement sent")
+
+        raise ex
       end
     end
   end
