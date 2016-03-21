@@ -43,6 +43,16 @@ describe Tackle::Worker do
     end
 
     context "with exceptions" do
+      let(:test_exception) { Exception.new("test_exception") }
+
+      def handle_worker_exception
+        yield
+      rescue Exception => ex
+        puts "An exception was raised, message: '#{ex.message}'"
+
+        # Handle only test exceptions, but raise others to break the tests when the code is broken
+        raise ex unless ex.message == "test_exception"
+      end
 
       it "tries to process message, sends message to DLQ and gets it back to source queue" do
         @worker.rabbit.queue.purge
@@ -52,9 +62,12 @@ describe Tackle::Worker do
 
         delivery_info, properties, payload = @worker.rabbit.queue.pop(:manual_ack => true)
         execution_queue = []
-        processor = Proc.new { |body| execution_queue << body + "0"; raise Exception }
+        processor = Proc.new { |body| execution_queue << body + "0"; raise test_exception }
 
-        @worker.process_message(delivery_info, properties, payload, processor)
+        handle_worker_exception do
+          @worker.process_message(delivery_info, properties, payload, processor)
+        end
+
         expect(execution_queue).to eql(["x0"])
 
         expect(@worker.rabbit.queue.message_count).to eql(0)
@@ -76,24 +89,36 @@ describe Tackle::Worker do
         expect(@worker.rabbit.queue.message_count).to eql(1)
 
         execution_queue = []
-        processor = Proc.new { |body| execution_queue << body + "1"; raise Exception }
+        processor = Proc.new { |body| execution_queue << body + "1"; raise test_exception }
 
         delivery_info, properties, payload = @worker.rabbit.queue.pop(:manual_ack => true)
-        @worker.process_message(delivery_info, properties, payload, processor)
+
+        handle_worker_exception do
+          @worker.process_message(delivery_info, properties, payload, processor)
+        end
+
         expect(execution_queue).to eql(["x1"])
 
         sleep(6)
 
         # First retry
         delivery_info, properties, payload = @worker.rabbit.queue.pop(:manual_ack => true)
-        @worker.process_message(delivery_info, properties, payload, processor)
+
+        handle_worker_exception do
+          @worker.process_message(delivery_info, properties, payload, processor)
+        end
+
         expect(execution_queue).to eql(["x1", "x1"])
 
         sleep(6)
 
         # Second retry
         delivery_info, properties, payload = @worker.rabbit.queue.pop(:manual_ack => true)
-        @worker.process_message(delivery_info, properties, payload, processor)
+
+        handle_worker_exception do
+          @worker.process_message(delivery_info, properties, payload, processor)
+        end
+
         expect(execution_queue).to eql(["x1", "x1", "x1"])
 
         sleep(1)
