@@ -21,6 +21,7 @@ module Tackle
     #
     # @api public
     def initialize(exchange_name, routing_key, queue_name, options = {})
+      @queue_name = queue_name
       @amqp_url = options[:url] || "amqp://localhost:5672"
       @retry_limit = options[:retry_limit] || 8
       @retry_delay = (options[:retry_delay] || 30) * 1000 #ms
@@ -28,10 +29,11 @@ module Tackle
 
       @rabbit = Tackle::Rabbit.new(exchange_name,
                                    routing_key,
-                                   queue_name,
+                                   @queue_name,
                                    @amqp_url,
                                    @retry_delay,
                                    @logger)
+
       @rabbit.connect
     end
 
@@ -41,7 +43,7 @@ module Tackle
     #
     # @api public
     def subscribe(&block)
-      tackle_log("Subscribing to queue...")
+      tackle_log("Subscribing to queue '#{@queue_name}'...")
       rabbit.queue.subscribe(:manual_ack => true,
                              :block => true) do |delivery_info, properties, payload|
 
@@ -52,6 +54,10 @@ module Tackle
       end
     rescue Interrupt => _
       rabbit.close
+    rescue StandardError => ex
+      tackle_log("An exception occured message='#{ex.message}'")
+
+      raise ex
     end
 
     def process_message(delivery_info, properties, payload, block)
