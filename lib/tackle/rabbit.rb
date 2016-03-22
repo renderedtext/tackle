@@ -39,7 +39,7 @@ module Tackle
     private
 
     def connect_queue
-      @exchange = @channel.fanout(@exchange_name)
+      @exchange = @channel.direct(@exchange_name)
       tackle_log("Connected to exchange '#{@exchange_name}'")
       @queue = @channel.queue(@queue_name, :durable => true).bind(@exchange, :routing_key => @routing_key)
       tackle_log("Connected to queue '#{@queue_name}'")
@@ -48,7 +48,7 @@ module Tackle
     def connect_dead_letter_queue
       dead_letter_exchange_name = "#{@exchange_name}.dead_letter_exchange"
       tackle_log("Connected to dead letter exchange '#{dead_letter_exchange_name}'")
-      dead_letter_exchange = @channel.fanout(dead_letter_exchange_name)
+      dead_letter_exchange = @channel.direct(dead_letter_exchange_name)
       dead_letter_queue_name = "#{@exchange_name}_dead_letter_queue"
       @dead_letter_queue  = @channel.queue(dead_letter_queue_name, :durable => true,
                                           :arguments => {"x-dead-letter-exchange" => @exchange.name,
