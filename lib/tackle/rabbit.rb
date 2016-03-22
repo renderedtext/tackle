@@ -58,9 +58,16 @@ module Tackle
 
       dead_letter_exchange = @channel.direct(dead_letter_exchange_name)
 
-      @dead_letter_queue  = @channel.queue(dead_letter_queue_name, :durable => true,
-                                          :arguments => {"x-dead-letter-exchange" => @exchange.name,
-                                                         "x-message-ttl" => @retry_delay}).bind(dead_letter_exchange)
+      queue_options = {
+        :durable => true,
+        :arguments => {
+          "x-dead-letter-exchange" => @exchange.name,
+          "x-message-ttl" => @retry_delay
+        }
+      }
+
+      @dead_letter_queue = @channel.queue(dead_letter_queue_name, queue_options).bind(dead_letter_exchange)
+
       tackle_log("Connected to dead letter queue '#{dead_letter_queue_name}'")
     end
 
