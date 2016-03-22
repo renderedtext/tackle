@@ -36,6 +36,14 @@ module Tackle
       tackle_log("Closed connection to RabbitMQ")
     end
 
+    def dead_letter_exchange_name
+      "#{@exchange_name}.dead_letter_exchange"
+    end
+
+    def dead_letter_queue_name
+      "#{@exchange_name}_dead_letter_queue"
+    end
+
     private
 
     def connect_queue
@@ -46,10 +54,10 @@ module Tackle
     end
 
     def connect_dead_letter_queue
-      dead_letter_exchange_name = "#{@exchange_name}.dead_letter_exchange"
       tackle_log("Connected to dead letter exchange '#{dead_letter_exchange_name}'")
+
       dead_letter_exchange = @channel.direct(dead_letter_exchange_name)
-      dead_letter_queue_name = "#{@exchange_name}_dead_letter_queue"
+
       @dead_letter_queue  = @channel.queue(dead_letter_queue_name, :durable => true,
                                           :arguments => {"x-dead-letter-exchange" => @exchange.name,
                                                          "x-message-ttl" => @retry_delay}).bind(dead_letter_exchange)
