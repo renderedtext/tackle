@@ -46,7 +46,7 @@ module Tackle
     end
 
     def dead_letter_queue_name
-      "#{@exchange_name}_dead_letter_queue"
+      "#{@queue_name}_dead_letters"
     end
 
     private
@@ -74,7 +74,7 @@ module Tackle
         }
       }
 
-      @dead_letter_queue = @channel.queue(dead_letter_queue_name, queue_options).bind(dead_letter_exchange)
+      @dead_letter_queue = @channel.queue(dead_letter_queue_name, queue_options).bind(dead_letter_exchange, :routing_key => @routing_key)
 
       tackle_log("Connected to dead letter queue '#{dead_letter_queue_name}'")
     end
