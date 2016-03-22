@@ -2,26 +2,13 @@ require 'spec_helper'
 
 describe Tackle::Worker do
 
-  let(:conn) do
-    conn = Bunny.new
-    conn.start
-    conn
-  end
-
-  after :each do
-    conn.close if conn.open?
+  before do
+    @worker = Tackle::Worker.new("test-exchange", "test-routing-key", "test-queue", :retry_limit => 2,
+                                                                                    :retry_delay => 5)
   end
 
   def send_message(message)
-    channel = conn.create_channel
-    x = channel.direct("test-exchange")
-    x.publish message, :routing_key => "test-routing-key"
-  end
-
-  before do
-    logger = Logger.new(STDOUT)
-    @worker = Tackle::Worker.new("test-exchange", "test-routing-key", "test-queue", :retry_limit => 2,
-                                                                                    :retry_delay => 5)
+    @worker.rabbit.exchange.publish(message, :routing_key => "test-routing-key")
   end
 
   describe "#process_message" do
@@ -76,7 +63,7 @@ describe Tackle::Worker do
         # Message is added to dead letter queue
         expect(@worker.rabbit.dead_letter_queue.message_count).to eql(1)
 
-        sleep(5)
+        sleep(6)
         # Once dead letter queue TTL expires message is pushed back to source queue
         expect(@worker.rabbit.dead_letter_queue.message_count).to eql(0)
         expect(@worker.rabbit.queue.message_count).to eql(1)

@@ -6,7 +6,7 @@ module Tackle
   class Rabbit
     include Tackle::TackleLogger
 
-    attr_reader :channel, :dead_letter_queue, :queue
+    attr_reader :channel, :dead_letter_queue, :queue, :exchange
 
     def initialize(exchange_name, routing_key, queue_name, amqp_url, retry_delay, logger)
       @exchange_name = exchange_name
@@ -57,18 +57,19 @@ module Tackle
 
       @queue = @channel.queue(@queue_name, :durable => true).bind(@exchange, :routing_key => @routing_key)
 
-      tackle_log("Connected to queue '#{@queue_name}'")
+      tackle_log("Connected to queue '#{@queue_name}' with routing key '#{@routing_key}'")
     end
 
     def connect_dead_letter_queue
       tackle_log("Connected to dead letter exchange '#{dead_letter_exchange_name}'")
 
-      dead_letter_exchange = @channel.direct(dead_letter_exchange_name)
+      dead_letter_exchange = @channel.fanout(dead_letter_exchange_name)
 
       queue_options = {
         :durable => true,
         :arguments => {
-          "x-dead-letter-exchange" => @exchange.name,
+          "x-dead-letter-exchange" => @exchange_name,
+          "x-dead-letter-routing-key" => @routing_key,
           "x-message-ttl" => @retry_delay
         }
       }
