@@ -14,7 +14,7 @@ describe Tackle::Worker do
 
   def send_message(message)
     channel = conn.create_channel
-    x = channel.fanout("test-exchange")
+    x = channel.direct("test-exchange")
     x.publish message, :routing_key => "test-routing-key"
   end
 
