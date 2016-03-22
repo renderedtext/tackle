@@ -33,6 +33,8 @@ module Tackle
                                    @amqp_url,
                                    @retry_delay,
                                    @logger)
+
+      @rabbit.connect
     end
 
     # Subscribes for message deliveries
@@ -41,8 +43,6 @@ module Tackle
     #
     # @api public
     def subscribe(&block)
-      @rabbit.connect
-
       tackle_log("Subscribing to queue '#{@queue_name}'...")
       rabbit.queue.subscribe(:manual_ack => true,
                              :block => true) do |delivery_info, properties, payload|

@@ -24,9 +24,14 @@ module Tackle
 
       @channel = @conn.create_channel
       @channel.prefetch(1)
+
       tackle_log("Connected to channel")
       connect_queue
       connect_dead_letter_queue
+    rescue StandardError => ex
+      tackle_log("An exception occured while connecting to the server message='#{ex.message}'")
+
+      raise ex
     end
 
     def close
@@ -49,7 +54,9 @@ module Tackle
     def connect_queue
       @exchange = @channel.direct(@exchange_name)
       tackle_log("Connected to exchange '#{@exchange_name}'")
+
       @queue = @channel.queue(@queue_name, :durable => true).bind(@exchange, :routing_key => @routing_key)
+
       tackle_log("Connected to queue '#{@queue_name}'")
     end
 
