@@ -10,6 +10,10 @@ describe Tackle::Publisher do
     end
 
     it "logs the message publishing" do
+      expect(@publisher).to receive(:tackle_log).with("Publishing message started to exchange='test-exchange' routing_key='test-routing-key'")
+
+      expect(@publisher).to receive(:tackle_log).with("Publishing message finished to exchange='test-exchange' routing_key='test-routing-key'")
+
       @publisher.publish("test-message")
     end
 
