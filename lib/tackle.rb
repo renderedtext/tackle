@@ -24,7 +24,7 @@ module Tackle
                                 :retry_delay => retry_delay,
                                 :logger => logger)
 
-    worker.subscribe(block)
+    worker.subscribe(&block)
   end
 
   def self.publish(message, options = {})
