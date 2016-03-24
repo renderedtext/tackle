@@ -36,7 +36,7 @@ module Tackle
     amqp_url    = options[:url] || "amqp://localhost:5672"
     logger      = options[:logger] || Logger.new(STDOUT)
 
-    publisher = Tackle::Publisher.new(exchange_name, routing_key, queue_name, amqp_url, logger)
+    publisher = Tackle::Publisher.new(exchange_name, routing_key, amqp_url, logger)
 
     publisher.publish(message)
   end
