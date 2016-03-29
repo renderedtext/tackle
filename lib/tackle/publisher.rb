@@ -30,7 +30,7 @@ module Tackle
     def with_rabbit_connection
       tackle_log("Establishing rabbit connection")
 
-      conn = Bunny.new
+      conn = Bunny.new(@url)
       conn.start
 
       yield(conn)
