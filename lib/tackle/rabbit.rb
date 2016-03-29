@@ -52,7 +52,7 @@ module Tackle
     private
 
     def connect_queue
-      @exchange = @channel.direct(@exchange_name)
+      @exchange = @channel.direct(@exchange_name, :durable => true)
       tackle_log("Connected to exchange '#{@exchange_name}'")
 
       @queue = @channel.queue(@queue_name, :durable => true).bind(@exchange, :routing_key => @routing_key)

@@ -16,7 +16,7 @@ module Tackle
         channel = conn.create_channel
         tackle_log("Created a communication channel")
 
-        exchange = channel.direct(@exchange_name)
+        exchange = channel.direct(@exchange_name, :durable => true)
         tackle_log("Declared the exchange")
 
         exchange.publish(message, :routing_key => @routing_key, :persistent => true)
