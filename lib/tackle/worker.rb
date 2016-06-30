@@ -35,6 +35,7 @@ module Tackle
                                    @logger)
 
       @rabbit.connect
+      @rabbit.on_uncaught_exception(options[:on_uncaught_exception]) if options[:on_uncaught_exception]
     end
 
     # Subscribes for message deliveries

@@ -34,6 +34,10 @@ module Tackle
       raise ex
     end
 
+    def on_uncaught_exception(blk)
+      @channel.on_uncaught_exception(&blk)
+    end
+
     def close
       @channel.close
       tackle_log("Closed channel")

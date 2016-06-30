@@ -15,6 +15,7 @@ module Tackle
     retry_limit = options[:retry_limit]
     retry_delay = options[:retry_delay]
     logger      = options[:logger]
+    on_uncaught_exception = options[:on_uncaught_exception]
 
     worker = Tackle::Worker.new(exchange_name,
                                 routing_key,
@@ -22,7 +23,8 @@ module Tackle
                                 :url => amqp_url,
                                 :retry_limit => retry_limit,
                                 :retry_delay => retry_delay,
-                                :logger => logger)
+                                :logger => logger,
+                                :on_uncaught_exception => on_uncaught_exception)
 
     worker.subscribe(&block)
   end
