@@ -36,6 +36,27 @@ describe Tackle do
 
       expect(received_messages).to eq ["Hello World!!!"]
     end
+
+    it "allows consumer to handle exceptions" do
+      exception_handler = double(:exception_handler)
+      on_uncaught_exception = proc { |ex| exception_handler.notify(ex.message) }
+      @subscribe_options.merge!({ :on_uncaught_exception => on_uncaught_exception })
+
+      allow(exception_handler).to receive(:notify).with("exception during processing message")
+      expect(exception_handler).to receive(:notify).with("exception during processing message")
+
+      Thread.new do
+        Tackle.subscribe(@subscribe_options) do |message|
+          raise "exception during processing message"
+        end
+      end
+
+      sleep(1)
+
+      Tackle.publish("Hello World", :exchange => @subscribe_options[:exchange], :routing_key => @subscribe_options[:routing_key])
+
+    end
   end
+
 
 end
