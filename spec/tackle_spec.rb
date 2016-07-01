@@ -39,11 +39,16 @@ describe Tackle do
 
     it "allows consumer to handle exceptions" do
       exception_handler = double(:exception_handler)
-      on_uncaught_exception = proc { |ex| exception_handler.notify(ex.message) }
-      @subscribe_options.merge!({ :on_uncaught_exception => on_uncaught_exception })
+
+      @subscribe_options = {
+        :exchange => "exception_test",
+        :on_uncaught_exception => proc { |ex| exception_handler.notify(ex.message) },
+        :routing_key => "routing_key",
+        :queue => "exception_queue"
+      }
 
       allow(exception_handler).to receive(:notify).with("exception during processing message")
-      expect(exception_handler).to receive(:notify).with("exception during processing message")
+      expect(exception_handler).to receive(:notify)
 
       Thread.new do
         Tackle.subscribe(@subscribe_options) do |message|
@@ -53,8 +58,9 @@ describe Tackle do
 
       sleep(1)
 
-      Tackle.publish("Hello World", :exchange => @subscribe_options[:exchange], :routing_key => @subscribe_options[:routing_key])
-
+      Tackle.publish("Hi World",
+                     :exchange => @subscribe_options[:exchange],
+                     :routing_key => @subscribe_options[:routing_key])
     end
   end
 
