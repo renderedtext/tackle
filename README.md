@@ -9,7 +9,7 @@ Tackles the problem of processing asynchronous jobs in reliable manner by relyin
 Add this line to your application's Gemfile:
 
 ```ruby
-gem "tackle", :source => "https://gem.fury.io/renderedtext/"
+gem "tackle"
 ```
 
 ## Usage
