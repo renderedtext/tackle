@@ -14,7 +14,7 @@ gem "tackle", :git => "https://github.com/renderedtext/tackle"
 
 ## Usage
 
-Subscribe consumer:
+### Subscribe consumer:
 
 ```ruby
 require "tackle"
@@ -34,7 +34,7 @@ Tackle.subscribe(options) do |message|
 end
 ```
 
-Publish message:
+### Publish message:
 
 ```ruby
 
@@ -57,4 +57,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/tackle.
+Bug reports and pull requests are welcome on GitHub at https://github.com/renderedtext/tackle
