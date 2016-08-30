@@ -9,52 +9,43 @@ Tackles the problem of processing asynchronous jobs in reliable manner by relyin
 Add this line to your application's Gemfile:
 
 ```ruby
-gem "tackle"
+gem "tackle", :git => "https://github.com/renderedtext/tackle"
 ```
 
 ## Usage
 
+### Subscribe consumer:
+
 ```ruby
-require "tackle/worker"
+require "tackle"
 
-class ReliableWorker
+options = {
+  :url         => "amqp://localhost", # optional
+  :exchange    => "test-exchange",    # required
+  :routing_key => "test-messages",    # required
+  :queue       => "test-queue",       # required
+  :retry_limit => 8,                  # optional
+  :retry_delay => 30,                 # optional
+  :logger      => Logger.new(STDOUT)  # optional
+}
 
-  def initialize
-    @worker = Tackle::Worker.new("test-exchange",
-                                 "test-queue", :url => "amqp://localhost:5672"
-                                               :retry_limit => 2,
-                                               :retry_delay => 15,
-                                               :logger => logger)
-  end
-
-  def run
-    @worker.subscribe { |message| perform(message) }
-  end
-
-  def perform(message)
-    # do something fun
-  end
-
+Tackle.subscribe(options) do |message|
+  # Do something with message
 end
 ```
 
-### How to run Tackle workers
-
-Subscribe call will block and wait for messages so you have to run each worker in it's own process.
+### Publish message:
 
 ```ruby
-namespace :app do
-  desc "Processes messages realiably"
-  task :start_worker => :environment do
-    ReliableWorker.new.run
-  end
-end
-```
 
-Run your task with:
+options = {
+  :url         => "amqp://localhost", # optional
+  :exchange    => "test-exchange",    # required
+  :routing_key => "test-messages",    # required
+  :logger      => Logger.new(STDOUT)  # optional
+}
 
-```bash
-bundle exec rake app:start_worker
+Tackle.publish("Hello, world!", options)
 ```
 
 ## Development
@@ -66,6 +57,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/tackle.
-
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/renderedtext/tackle
