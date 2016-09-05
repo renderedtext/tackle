@@ -17,7 +17,7 @@ module Tackle
         @retry_limit = params.retry_limit
 
         @remote_exchange_name = @params.exchange
-        @local_exchange_name  = "#{@params.service_name}.#{@params.routing_key}"
+        @local_exchange_name  = "#{@params.service}.#{@params.routing_key}"
       end
 
       def create_exchanges
@@ -34,11 +34,11 @@ module Tackle
           :arguments => {
             "x-dead-letter-exchange" => @local_exchange_name,
             "x-dead-letter-routing-key" => @params.routing_key,
-            "x-message-ttl" => @params.retry_delay
+            "x-message-ttl" => @params.retry_delay * 1000 # miliseconds
           }
         }
 
-        @queue       = @connection.create_queue(service_queue_name)
+        @queue       = @connection.create_queue(queue_name)
         @delay_queue = @connection.create_queue(delay_queue_name, delay_options)
         @dead_queue  = @connection.create_queue(dead_queue_name)
 

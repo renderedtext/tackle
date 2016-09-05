@@ -6,8 +6,7 @@ module Tackle
   require "tackle/consumer"
 
   def self.consume(params = {}, &block)
-    params = Tackle::Params.new(params)
-
+    params   = Tackle::Consumer::Params.new(params)
     consumer = Tackle::Consumer.new(params)
 
     consumer.subscribe(&block)

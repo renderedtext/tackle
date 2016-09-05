@@ -1,13 +1,14 @@
 module Tackle
+  require_relative "consumer/params"
+  require_relative "consumer/service"
+  require_relative "consumer/connection"
+  require_relative "consumer/message"
+
   class Consumer
-    require_relative "consumer/params"
-    require_relative "consumer/service"
-    require_relative "consumer/connection"
-    require_relative "consumer/message"
 
     def initialize(params)
       @params = params
-      @logger = Logger.new(STDOUT)
+      @logger = @params.logger
     end
 
     def subscribe(&block)

@@ -9,14 +9,16 @@ module Tackle
       end
 
       def connect
-        @connection = Bunny.new(@amqp_url)
+        @logger.info("Connecting to RabbitMQ")
+
+        @connection = Bunny.new(@params.amqp_url)
         @connection.start
 
         @logger.info("Connected to RabbitMQ")
 
         @channel = @connection.create_channel
         @channel.prefetch(1)
-        @channel.on_uncaught_exception(@params.exception_handler)
+        @channel.on_uncaught_exception(&@params.exception_handler)
 
         @logger.info("Connected to channel")
       rescue StandardError => ex
@@ -29,6 +31,12 @@ module Tackle
         @logger.info("Creating exchange '#{exchange_name}'")
 
         @channel.direct(exchange_name, :durable => true)
+      end
+
+      def create_queue(queue_name, options = {})
+        @logger.info("Creating queue '#{queue_name}'")
+
+        @channel.queue(queue_name, options.merge(:durable => true))
       end
 
       def close
