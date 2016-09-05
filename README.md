@@ -44,7 +44,31 @@ options = {
 Tackle.publish("Hello World!", options)
 ```
 
-### Subscribe to an exchange
+### Consume messages
+
+Tackle enables you to connect to an AMQP exchange and consume messages from it.
+
+```ruby
+require "tackle"
+
+options = {
+  :url => "amqp://localhost",
+  :exchange => "users",
+  :routing_key => "signed-up"
+  :service => "user-mailer"
+}
+
+Tackle.consume(options) do |message|
+  puts message
+end
+```
+
+![Tackle consumer](docs/consumer.png)
+
+
+### [DEPRECATED] Subscribe to an exchange
+
+**Deprecation notice:** For newer projects please use `Tackle.consume`.
 
 To consume messages from an exchange, do the following:
 
