@@ -25,6 +25,12 @@ module Tackle
         raise ex
       end
 
+      def create_exchange(exchange_name)
+        @logger.info("Creating exchange '#{exchange_name}'")
+
+        @channel.direct(exchange_name, :durable => true)
+      end
+
       def close
         @channel.close
         @logger.info("Closed channel")

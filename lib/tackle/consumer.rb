@@ -1,5 +1,9 @@
 module Tackle
   class Consumer
+    require_relative "consumer/params"
+    require_relative "consumer/service"
+    require_relative "consumer/connection"
+    require_relative "consumer/message"
 
     def initialize(params)
       @params = params
@@ -10,11 +14,17 @@ module Tackle
       connection = Tackle::Consumer::Connection.new(@params, @logger)
       connection.connect
 
-      service = Tackle::Consumer::Service.new(@params.service, connection, @logger)
-      service.create_exchanges(@params.exchange)
-      service.create_queues(@params.retry_delay)
+      service = Tackle::Consumer::Service.new(@params, connection, @logger)
+      service.create_exchanges
+      service.create_queues
 
-      service.consume(@params.retry_limit, &block)
+      service.subscribe do |delivery_info, properties, payload|
+        message = Tackle::Consumer::Message.new(service,
+                                                delivery_info,
+                                                properties,
+                                                payload)
+        message.process(&block)
+      end
     rescue Interrupt => _
       connection.close
     rescue StandardError => ex
