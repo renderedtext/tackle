@@ -1,6 +1,8 @@
 module Tackle
   class Consumer
     class Connection
+      attr_reader :channel
+
       def initialize(params, logger)
         @params = params
         @logger = logger

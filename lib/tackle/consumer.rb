@@ -10,12 +10,11 @@ module Tackle
       connection = Tackle::Consumer::Connection.new(@params, @logger)
       connection.connect
 
-      processor = Tackle::Consumer::MessageProcessor.new(&block)
-      options = { :manual_ack => true, :block => true }
+      service = Tackle::Consumer::Service.new(@params.service, connection, @logger)
+      service.create_exchanges(@params.exchange)
+      service.create_queues(@params.retry_delay)
 
-      @queue.subscribe(options) do |delivery_info, properties, payload|
-        @processor.process_message(delivery_info, properties, payload)
-      end
+      service.consume(@params.retry_limit, &block)
     rescue Interrupt => _
       connection.close
     rescue StandardError => ex
