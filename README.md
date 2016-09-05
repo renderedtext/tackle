@@ -63,8 +63,64 @@ Tackle.consume(options) do |message|
 end
 ```
 
+The above code snippet creates the following AMQP resources:
+
+1. A dedicated exchange for your service, in this example `user-mailer.signed-up`
+2. Connects your dedicated `user-mailer.signed-up` exchange to the remote
+   exchange from which you want to consume messages, in this example `users`
+   exchange
+3. Creates an AMQP queue `user-mailer.signed-up` and connects it to your local
+   exchange
+4. Creates a delay queue `user-mailer.signed-up.delay`. If your service raises
+   an exception while processing an incoming message, tackle will put it in this
+   this queue, wait for a while, and then republish to the
+   `user-mailer.signed-up` exchange.
+5. Creates a dead queue `user-mailer.signed-up.dead`. After several retries
+   where your service can't consume the message, tackle will store them in a
+   dedicated dead queue. You can consume this messages manually.
+
 ![Tackle consumer](docs/consumer.png)
 
+You can pass additional configuration to tackle in order to control the number
+of retries, and the delay between each retry.
+
+```ruby
+require "tackle"
+
+options = {
+  :url => "amqp://localhost",
+  :exchange => "users",
+  :routing_key => "signed-up"
+  :service => "user-mailer",
+  :retry_limit => 8,
+  :retry_delay => 30
+}
+
+Tackle.consume(options) do |message|
+  puts message
+end
+```
+
+By default, tackle logs helpful information to the `STDOUT`. To redirect these
+messages to a file, pass a dedicated logger to tackle.
+
+```ruby
+require "tackle"
+
+options = {
+  :url => "amqp://localhost",
+  :exchange => "users",
+  :routing_key => "signed-up"
+  :service => "user-mailer",
+  :retry_limit => 8,
+  :retry_delay => 30,
+  :logger => Logger.new("consumer.log")
+}
+
+Tackle.consume(options) do |message|
+  puts message
+end
+```
 
 ### [DEPRECATED] Subscribe to an exchange
 
