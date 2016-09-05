@@ -1,6 +1,6 @@
 # Tackle
 
-[![Build Status](https://semaphoreci.com/api/v1/projects/b39e2ae2-2516-4fd7-9e2c-f5be1a043ff5/732979/badge.svg)](https://semaphoreci.com/renderedtext/tackle)
+[![Build Status](https://semaphoreci.com/api/v1/renderedtext/tackle/branches/master/badge.svg)](https://semaphoreci.com/renderedtext/tackle)
 
 Tackles the problem of processing asynchronous jobs in reliable manner
 by relying on RabbitMQ.
@@ -15,42 +15,97 @@ gem "rt-tackle", :require => "tackle"
 
 ## Usage
 
-### Subscribe consumer:
+### Publishing a message
+
+With tackle, you can publish a message to an AMQP exchange. For example, to
+publish `"Hello World!"` do the following:
+
+```ruby
+options = {
+  :url => "amqp://localhost",
+  :exchange => "test-exchange",
+  :routing_key => "test-messages",
+}
+
+Tackle.publish("Hello World!", options)
+```
+
+Optionally, you can pass a dedicated logger to the publish method. This comes
+handy if you want to log the status of your publish action to a file.
+
+```ruby
+options = {
+  :url => "amqp://localhost",
+  :exchange => "test-exchange",
+  :routing_key => "test-messages",
+  :logger => Logger.new("publish.log")
+}
+
+Tackle.publish("Hello World!", options)
+```
+
+### Subscribe to an exchange
+
+To consume messages from an exchange, do the following:
 
 ```ruby
 require "tackle"
 
 options = {
-  :url         => "amqp://localhost", # optional
-  :exchange    => "test-exchange",    # required
-  :routing_key => "test-messages",    # required
-  :queue       => "test-queue",       # required
-  :retry_limit => 8,                  # optional
-  :retry_delay => 30,                 # optional
-  :logger      => Logger.new(STDOUT)  # optional
+  :url => "amqp://localhost",
+  :exchange => "test-exchange",
+  :routing_key => "test-messages",
+  :queue => "test-queue"
 }
 
 Tackle.subscribe(options) do |message|
-  # Do something with message
+  puts message
 end
 ```
 
-### Publish message:
+By default, tackle will retry any message that fails to be consumed. To
+configure the retry limit and the delay in which the messages will be retried,
+do the following:
 
 ```ruby
+require "tackle"
 
 options = {
-  :url         => "amqp://localhost", # optional
-  :exchange    => "test-exchange",    # required
-  :routing_key => "test-messages",    # required
-  :logger      => Logger.new(STDOUT)  # optional
+  :url => "amqp://localhost",
+  :exchange => "test-exchange",
+  :routing_key => "test-messages",
+  :queue => "test-queue",
+  :retry_limit => 8,
+  :retry_delay => 30
 }
 
-Tackle.publish("Hello, world!", options)
+Tackle.subscribe(options) do |message|
+  puts message
+end
+```
+
+Tackle uses the `STDOUT` by default to trace the state of incoming messages. You
+can pass a dedicated logger to the `subscribe` method to redirect the output:
+
+```ruby
+require "tackle"
+
+options = {
+  :url => "amqp://localhost",
+  :exchange => "test-exchange",
+  :routing_key => "test-messages",
+  :queue => "test-queue",
+  :retry_limit => 8,
+  :retry_delay => 30,
+  :logger => Logger.new("subscribe.log")
+}
+
+Tackle.subscribe(options) do |message|
+  puts message
+end
 ```
 
 ## Development
-
 
 After checking out the repo, run `bin/setup` to install dependencies. Then,
 run `rake rspec` to run the tests. You can also run `bin/console` for an
