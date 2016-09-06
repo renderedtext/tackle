@@ -4,23 +4,25 @@ describe "Multiple Consumers" do
   before(:all) do
     @tackle_options = {
       :url => "amqp://localhost",
-      :exchange => "test-exchange",
+      :exchange => "multiple-consumer-exchange",
       :routing_key => "test-key",
       :retry_delay => 1,
       :retry_limit => 3
     }
 
     @healthy_service_messages = []
-    @healthy_consumer_options = @tackle_options.merge(:service => "healthy-service")
-    Thread.new do
+    @healthy_consumer_options = @tackle_options.merge(:service => "multi-healthy-service")
+
+    @healthy_worker = Thread.new do
       Tackle.consume(@healthy_consumer_options) do |message|
         @healthy_service_messages << message
       end
     end
 
     @broken_service_messages = []
-    @broken_consumer_options  = @tackle_options.merge(:service => "broken-service")
-    Thread.new do
+    @broken_consumer_options  = @tackle_options.merge(:service => "multi-broken-service")
+
+    @broken_worker = Thread.new do
       Tackle.consume(@broken_consumer_options) do |message|
         @broken_service_messages << message
         raise "Test exception"
@@ -31,7 +33,12 @@ describe "Multiple Consumers" do
 
     Tackle.publish("Hi!", @tackle_options)
 
-    sleep 10
+    sleep 7
+  end
+
+  after(:all) do
+    @healthy_worker.kill
+    @broken_worker.kill
   end
 
   describe "healthy service" do
@@ -40,7 +47,7 @@ describe "Multiple Consumers" do
     end
 
     it "clears the queue from messages" do
-      expect(BunnyHelper.message_count("healthy-service.test-key")).to eq(0)
+      expect(BunnyHelper.message_count("multi-healthy-service.test-key")).to eq(0)
     end
   end
 
@@ -50,11 +57,11 @@ describe "Multiple Consumers" do
     end
 
     it "clears the queue from messages" do
-      expect(BunnyHelper.message_count("broken-service.test-key")).to eq(0)
+      expect(BunnyHelper.message_count("multi-broken-service.test-key")).to eq(0)
     end
 
     it "puts the message to the dead queue" do
-      expect(BunnyHelper.message_count("broken-service.test-key.dead")).to be > 0
+      expect(BunnyHelper.message_count("multi-broken-service.test-key.dead")).to be > 0
     end
   end
 end

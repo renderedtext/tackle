@@ -14,7 +14,7 @@ describe "Broken Consumers" do
       :retry_limit => 3
     }
 
-    Thread.new do
+    @worker = Thread.new do
       Tackle.consume(@tackle_options) do |message|
         @messages << message
         @timestamps << Time.now
@@ -27,6 +27,10 @@ describe "Broken Consumers" do
     Tackle.publish("Hi!", @tackle_options)
 
     sleep 5
+  end
+
+  after(:all) do
+    @worker.kill
   end
 
   describe "message consumption" do
@@ -48,9 +52,9 @@ describe "Broken Consumers" do
     end
 
     it "waits 'retry_delay' between each retry" do
-      expect(@timestamps[1] - @timestamps[0]).to be_within(0.1).of(1)
-      expect(@timestamps[2] - @timestamps[1]).to be_within(0.1).of(1)
-      expect(@timestamps[3] - @timestamps[2]).to be_within(0.1).of(1)
+      expect(@timestamps[1] - @timestamps[0]).to be_within(0.5).of(1)
+      expect(@timestamps[2] - @timestamps[1]).to be_within(0.5).of(1)
+      expect(@timestamps[3] - @timestamps[2]).to be_within(0.5).of(1)
     end
   end
 end

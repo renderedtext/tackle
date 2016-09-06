@@ -13,13 +13,17 @@ describe "Queue creation" do
       :retry_limit => 3
     }
 
-    Thread.new do
+    @worker = Thread.new do
       Tackle.consume(@tackle_options) do |message|
         @messages << message
       end
     end
 
     sleep 2
+  end
+
+  after(:all) do
+    @worker.kill
   end
 
   describe "queues" do

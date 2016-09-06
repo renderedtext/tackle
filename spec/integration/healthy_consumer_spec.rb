@@ -8,12 +8,12 @@ describe "Healthy Consumers" do
       :url => "amqp://localhost",
       :exchange => "test-exchange",
       :routing_key => "test-key",
-      :service => "test-service",
+      :service => "healthy-service",
       :retry_delay => 1,
       :retry_limit => 3
     }
 
-    Thread.new do
+    @worker = Thread.new do
       Tackle.consume(@tackle_options) do |message|
         @messages << message
       end
@@ -24,6 +24,10 @@ describe "Healthy Consumers" do
     Tackle.publish("Hi!", @tackle_options)
 
     sleep 10
+  end
+
+  after(:all) do
+    @worker.kill
   end
 
   describe "message consumption" do
