@@ -3,40 +3,31 @@ module Tackle
     class Connection
       attr_reader :channel
 
-      def initialize(params, logger)
-        @params = params
+      def initialize(amqp_url, uncought_exception_handler, logger)
+        @amqp_url = amqp_url
+        @uncought_exception_handler = uncought_exception_handler
         @logger = logger
+
+        connect
       end
 
       def connect
         @logger.info("Connecting to RabbitMQ")
 
-        @connection = Bunny.new(@params.amqp_url)
+        @connection = Bunny.new(@amqp_url)
         @connection.start
 
         @logger.info("Connected to RabbitMQ")
 
         @channel = @connection.create_channel
         @channel.prefetch(1)
-        @channel.on_uncaught_exception(&@params.on_uncaught_exception)
+        @channel.on_uncaught_exception(&@uncaught_exception_handler)
 
         @logger.info("Connected to channel")
       rescue StandardError => ex
         @logger.error("Error while connecting to RabbitMQ message='#{ex}'")
 
         raise ex
-      end
-
-      def create_exchange(exchange_name)
-        @logger.info("Creating exchange '#{exchange_name}'")
-
-        @channel.direct(exchange_name, :durable => true)
-      end
-
-      def create_queue(queue_name, options = {})
-        @logger.info("Creating queue '#{queue_name}'")
-
-        @channel.queue(queue_name, options.merge(:durable => true))
       end
 
       def close
