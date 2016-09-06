@@ -36,11 +36,11 @@ describe "Healthy Consumers" do
     end
 
     it "cleares the queue" do
-      expect(BunnyHelper.message_count("test-service.test-key")).to be(0)
+      expect(BunnyHelper.message_count("healthy-service.test-key")).to be(0)
     end
 
     it "leaves the dead queue empty" do
-      expect(BunnyHelper.message_count("test-service.test-key.dead")).to be(0)
+      expect(BunnyHelper.message_count("healthy-service.test-key.dead")).to be(0)
     end
   end
 end

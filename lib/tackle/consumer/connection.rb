@@ -22,7 +22,7 @@ module Tackle
 
         @logger.info("Connected to channel")
       rescue StandardError => ex
-        @logger.error("An exception occured while connecting to Rabbit server message='#{ex.message}'")
+        @logger.error("Error while connecting to RabbitMQ message='#{ex}'")
 
         raise ex
       end
