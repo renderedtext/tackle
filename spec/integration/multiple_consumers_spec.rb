@@ -31,7 +31,7 @@ describe "Multiple Consumers" do
 
     Tackle.publish("Hi!", @tackle_options)
 
-    sleep 5
+    sleep 10
   end
 
   describe "healthy service" do

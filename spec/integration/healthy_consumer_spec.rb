@@ -23,7 +23,7 @@ describe "Healthy Consumers" do
 
     Tackle.publish("Hi!", @tackle_options)
 
-    sleep 2
+    sleep 10
   end
 
   describe "message consumption" do
