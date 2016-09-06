@@ -18,6 +18,7 @@ module Tackle
       service = Tackle::Consumer::Service.new(@params, connection, @logger)
       service.create_exchanges
       service.create_queues
+      service.bind
 
       service.subscribe do |delivery_info, properties, payload|
         message = Tackle::Consumer::Message.new(service,

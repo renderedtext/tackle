@@ -2,7 +2,6 @@ require "spec_helper"
 
 describe "Healthy Consumers" do
   before(:all) do
-    @exceptions = []
     @messages = []
 
     @tackle_options = {
@@ -11,8 +10,7 @@ describe "Healthy Consumers" do
       :routing_key => "test-key",
       :service => "test-service",
       :retry_delay => 1,
-      :retry_count => 3,
-      :exception_handler => Proc.new { |exception| @exceptions << exception }
+      :retry_limit => 3
     }
 
     Thread.new do
@@ -34,7 +32,7 @@ describe "Healthy Consumers" do
     end
 
     it "consumes the message" do
-      expect(@messages).to be_empty
+      expect(@messages).to eq(["Hi!"])
     end
 
     it "leaves the dead queue empty" do

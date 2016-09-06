@@ -9,7 +9,7 @@ module Tackle
       attr_reader :retry_limit
       attr_reader :retry_delay
       attr_reader :logger
-      attr_reader :exception_handler
+      attr_reader :on_uncaught_exception
 
       def initialize(params = {})
         # required
@@ -23,7 +23,7 @@ module Tackle
         @retry_delay = params[:retry_delay] || 30
         @logger      = params[:logger] || Logger.new(STDOUT)
 
-        @exception_handler = params[:on_uncaught_exception]
+        @on_uncaught_exception = params[:on_uncaught_exception]
       end
 
     end

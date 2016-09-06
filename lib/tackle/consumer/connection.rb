@@ -18,7 +18,7 @@ module Tackle
 
         @channel = @connection.create_channel
         @channel.prefetch(1)
-        @channel.on_uncaught_exception(&@params.exception_handler)
+        @channel.on_uncaught_exception(&@params.on_uncaught_exception)
 
         @logger.info("Connected to channel")
       rescue StandardError => ex

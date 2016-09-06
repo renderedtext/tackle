@@ -2,7 +2,6 @@ require "spec_helper"
 
 describe "Exchange creation" do
   before(:all) do
-    @exceptions = []
     @messages = []
 
     @tackle_options = {
@@ -11,8 +10,7 @@ describe "Exchange creation" do
       :routing_key => "test-key",
       :service => "test-service",
       :retry_delay => 1,
-      :retry_count => 3,
-      :exception_handler => Proc.new { |exception| @exceptions << exception }
+      :retry_limit => 3
     }
 
     Thread.new do
