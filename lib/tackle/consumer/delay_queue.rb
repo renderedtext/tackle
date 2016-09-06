@@ -3,6 +3,8 @@ module Tackle
     class DelayQueue < Tackle::Consumer::Queue
 
       def initialize(retry_delay, exchange, connection, logger)
+        @retry_delay = retry_delay
+
         name = "#{exchange.name}.delay.#{retry_delay}"
 
         options = {

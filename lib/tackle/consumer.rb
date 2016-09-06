@@ -30,6 +30,8 @@ module Tackle
     end
 
     def subscribe(&block)
+      @logger.info "Subscribing to the main queue '#{@main_queue.name}'"
+
       @main_queue.subscribe { |message| process_message(message, &block) }
     rescue Interrupt => _
       @connection.close
