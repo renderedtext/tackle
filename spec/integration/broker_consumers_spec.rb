@@ -26,7 +26,7 @@ describe "Broken Consumers" do
 
     Tackle.publish("Hi!", @tackle_options)
 
-    sleep 10
+    sleep 5
   end
 
   describe "message consumption" do

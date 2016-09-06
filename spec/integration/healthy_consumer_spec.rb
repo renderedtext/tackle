@@ -27,18 +27,16 @@ describe "Healthy Consumers" do
   end
 
   describe "message consumption" do
-    it "doesn't raise any exception" do
-      expect(@exceptions).to be_empty
-    end
-
     it "consumes the message" do
       expect(@messages).to eq(["Hi!"])
     end
 
-    it "leaves the dead queue empty" do
-      dead_queue = "test-service.test-key.dead"
+    it "cleares the queue" do
+      expect(BunnyHelper.message_count("test-service.test-key")).to be(0)
+    end
 
-      expect(BunnyHelper.message_count(dead_queue)).to be(0)
+    it "leaves the dead queue empty" do
+      expect(BunnyHelper.message_count("test-service.test-key.dead")).to be(0)
     end
   end
 end
