@@ -3,7 +3,16 @@ require "tackle/version"
 module Tackle
   require "tackle/worker"
   require "tackle/publisher"
+  require "tackle/consumer"
 
+  def self.consume(params = {}, &block)
+    params   = Tackle::Consumer::Params.new(params)
+    consumer = Tackle::Consumer.new(params)
+
+    consumer.subscribe(&block)
+  end
+
+  # deprecated
   def self.subscribe(options = {}, &block)
     # required
     exchange_name = options.fetch(:exchange)
