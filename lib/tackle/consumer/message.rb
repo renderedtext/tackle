@@ -7,7 +7,7 @@ module Tackle
       attr_reader :payload
 
       def initialize(connection, logger, delivery_info, properties, payload)
-        @connction = connection
+        @connection = connection
         @logger = logger
 
         @delivery_info = delivery_info
@@ -17,13 +17,13 @@ module Tackle
 
       def ack
         log_info "Sending positive acknowledgement to source queue"
-        @connction.channel.ack(delivery_tag)
+        @connection.channel.ack(delivery_tag)
         log_info "Positive acknowledgement sent"
       end
 
       def nack
         log_error "Sending negative acknowledgement to source queue"
-        @connction.channel.nack(delivery_tag)
+        @connection.channel.nack(delivery_tag)
         log_error "Negative acknowledgement sent"
       end
 
