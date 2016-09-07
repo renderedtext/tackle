@@ -3,9 +3,9 @@ module Tackle
     class Connection
       attr_reader :channel
 
-      def initialize(amqp_url, uncought_exception_handler, logger)
+      def initialize(amqp_url, exception_handler, logger)
         @amqp_url = amqp_url
-        @uncought_exception_handler = uncought_exception_handler
+        @exception_handler = exception_handler
         @logger = logger
 
         connect
@@ -21,7 +21,7 @@ module Tackle
 
         @channel = @connection.create_channel
         @channel.prefetch(1)
-        @channel.on_uncaught_exception(&@uncaught_exception_handler)
+        @channel.on_uncaught_exception(&@exception_handler)
 
         @logger.info("Connected to channel")
       rescue StandardError => ex

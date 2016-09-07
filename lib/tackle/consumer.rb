@@ -19,7 +19,7 @@ module Tackle
     end
 
     def setup_rabbit_connections
-      @connection = Connection.new(@params.amqp_url, @params.on_uncaught_exception, @logger)
+      @connection = Connection.new(@params.amqp_url, @params.exception_handler, @logger)
 
       @exchange    = Exchange.new(@params.service, @params.routing_key, @connection, @logger)
       @main_queue  = MainQueue.new(@exchange, @connection, @logger)
@@ -47,12 +47,14 @@ module Tackle
       block.call(message.payload)
 
       message.ack
-    rescue StandardError => ex
+    rescue Exception => ex
       message.log_error "Failed to process message. Received exception '#{ex}'"
 
       redeliver_message(message)
 
       message.nack
+
+      raise ex
     end
 
     def redeliver_message(message)

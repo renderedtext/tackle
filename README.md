@@ -54,8 +54,9 @@ require "tackle"
 options = {
   :url => "amqp://localhost",
   :exchange => "users",
-  :routing_key => "signed-up"
-  :service => "user-mailer"
+  :routing_key => "signed-up",
+  :service => "user-mailer",
+  :exception_handler => lambda { |ex, consumer| puts ex.message }
 }
 
 Tackle.consume(options) do |message|
@@ -93,7 +94,8 @@ options = {
   :routing_key => "signed-up"
   :service => "user-mailer",
   :retry_limit => 8,
-  :retry_delay => 30
+  :retry_delay => 30,
+  :exception_handler => lambda { |ex, consumer| puts ex.message }
 }
 
 Tackle.consume(options) do |message|
@@ -114,7 +116,8 @@ options = {
   :service => "user-mailer",
   :retry_limit => 8,
   :retry_delay => 30,
-  :logger => Logger.new("consumer.log")
+  :logger => Logger.new("consumer.log"),
+  :exception_handler => lambda { |ex, consumer| puts ex.message }
 }
 
 Tackle.consume(options) do |message|

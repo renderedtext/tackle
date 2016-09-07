@@ -4,6 +4,7 @@ describe "Broken Consumers" do
   before(:all) do
     @messages = []
     @timestamps = []
+    @exceptions = []
 
     @tackle_options = {
       :url => "amqp://localhost",
@@ -11,7 +12,8 @@ describe "Broken Consumers" do
       :routing_key => "test-key",
       :service => "broken-service",
       :retry_delay => 1,
-      :retry_limit => 3
+      :retry_limit => 3,
+      :exception_handler => lambda { |ex, consumer| @exceptions << ex }
     }
 
     @worker = Thread.new do
@@ -55,6 +57,11 @@ describe "Broken Consumers" do
       expect(@timestamps[1] - @timestamps[0]).to be_within(0.5).of(1)
       expect(@timestamps[2] - @timestamps[1]).to be_within(0.5).of(1)
       expect(@timestamps[3] - @timestamps[2]).to be_within(0.5).of(1)
+    end
+
+    it "records the exceptions" do
+      expect(@exceptions.size).to eq(4)
+      expect(@exceptions.map(&:message)).to all(eq "Test exception")
     end
   end
 end
