@@ -17,16 +17,11 @@ module Tackle
   end
 
   def publish(message, options = {})
-    # required
-    exchange_name = options.fetch(:exchange)
-    routing_key   = options.fetch(:routing_key)
+    url         = options.fetch(:url)
+    exchange    = options.fetch(:exchange)
+    routing_key = options.fetch(:routing_key)
+    logger      = options.fetch(:logger, Logger.new(STDOUT))
 
-    # optional
-    amqp_url    = options[:url] || "amqp://localhost:5672"
-    logger      = options[:logger] || Logger.new(STDOUT)
-
-    publisher = Tackle::Publisher.new(exchange_name, routing_key, amqp_url, logger)
-
-    publisher.publish(message)
+    Tackle::Publisher.new(url, exchange, routing_key, logger).publish(message)
   end
 end

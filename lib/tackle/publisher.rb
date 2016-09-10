@@ -1,10 +1,10 @@
 module Tackle
   class Publisher
 
-    def initialize(exchange_name, routing_key, url, logger)
+    def initialize(url, exchange_name, routing_key, logger)
+      @url = url
       @exchange_name = exchange_name
       @routing_key = routing_key
-      @url = url
       @logger = logger
     end
 
