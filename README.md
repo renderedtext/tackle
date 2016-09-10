@@ -125,69 +125,6 @@ Tackle.consume(options) do |message|
 end
 ```
 
-### [DEPRECATED] Subscribe to an exchange
-
-**Deprecation notice:** For newer projects please use `Tackle.consume`.
-
-To consume messages from an exchange, do the following:
-
-```ruby
-require "tackle"
-
-options = {
-  :url => "amqp://localhost",
-  :exchange => "test-exchange",
-  :routing_key => "test-messages",
-  :queue => "test-queue"
-}
-
-Tackle.subscribe(options) do |message|
-  puts message
-end
-```
-
-By default, tackle will retry any message that fails to be consumed. To
-configure the retry limit and the delay in which the messages will be retried,
-do the following:
-
-```ruby
-require "tackle"
-
-options = {
-  :url => "amqp://localhost",
-  :exchange => "test-exchange",
-  :routing_key => "test-messages",
-  :queue => "test-queue",
-  :retry_limit => 8,
-  :retry_delay => 30
-}
-
-Tackle.subscribe(options) do |message|
-  puts message
-end
-```
-
-Tackle uses the `STDOUT` by default to trace the state of incoming messages. You
-can pass a dedicated logger to the `subscribe` method to redirect the output:
-
-```ruby
-require "tackle"
-
-options = {
-  :url => "amqp://localhost",
-  :exchange => "test-exchange",
-  :routing_key => "test-messages",
-  :queue => "test-queue",
-  :retry_limit => 8,
-  :retry_delay => 30,
-  :logger => Logger.new("subscribe.log")
-}
-
-Tackle.subscribe(options) do |message|
-  puts message
-end
-```
-
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then,

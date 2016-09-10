@@ -1,6 +1,5 @@
 module Tackle
   require_relative "consumer/params"
-  require_relative "consumer/connection"
   require_relative "consumer/message"
   require_relative "consumer/exchange"
 
@@ -19,7 +18,7 @@ module Tackle
     end
 
     def setup_rabbit_connections
-      @connection = Connection.new(@params.amqp_url, @params.exception_handler, @logger)
+      @connection = Tackle::Connection.new(@params.amqp_url, @params.exception_handler, @logger)
 
       @exchange    = Exchange.new(@params.service, @params.routing_key, @connection, @logger)
       @main_queue  = MainQueue.new(@exchange, @connection, @logger)
