@@ -57,6 +57,8 @@ Tackle.publish("Hello World!", options)
 
 Tackle enables you to connect to an AMQP exchange and consume messages from it.
 
+![Tackle consumer](docs/consumer.png)
+
 ```ruby
 require "tackle"
 
@@ -88,8 +90,6 @@ The above code snippet creates the following AMQP resources:
 5. Creates a dead queue `user-mailer.signed-up.dead`. After several retries
    where your service can't consume the message, tackle will store them in a
    dedicated dead queue. You can consume this messages manually.
-
-![Tackle consumer](docs/consumer.png)
 
 You can pass additional configuration to tackle in order to control the number
 of retries, and the delay between each retry.
