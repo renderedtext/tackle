@@ -1,6 +1,5 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require 'tackle'
-require 'tackle/worker'
+require "tackle"
 
 module BunnyHelper
   module_function
