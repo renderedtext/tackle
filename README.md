@@ -22,9 +22,7 @@ Add this line to your application's Gemfile:
 gem "rt-tackle", :require => "tackle"
 ```
 
-## Usage
-
-### Publishing a message
+## Publishing messages
 
 With tackle, you can publish a message to an AMQP exchange. For example, to
 publish `"Hello World!"` do the following:
@@ -53,7 +51,7 @@ options = {
 Tackle.publish("Hello World!", options)
 ```
 
-### Consume messages
+## Consume messages
 
 Tackle enables you to connect to an AMQP exchange and consume messages from it.
 
