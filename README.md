@@ -5,11 +5,9 @@
 Tackles the problem of processing asynchronous jobs in reliable manner
 by relying on RabbitMQ.
 
-Tackle is only a thin wrapper around raw RabbitMQ based communication.
-
 You should also take a look at [Elixir Tackle](https://github.com/renderedtext/ex-tackle).
 
-## Why should I use tackle
+## Why should I use tackle?
 
 - It is ideal for fast microservice prototyping
 - It uses sane defaults for queue and exchange creation
