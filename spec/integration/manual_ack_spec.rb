@@ -4,6 +4,9 @@ describe "Manual Ack Mode" do
   before(:all) do
     @messages = []
 
+    BunnyHelper.delete_queue("manual-acking-service.test-key")
+    BunnyHelper.delete_queue("manual-acking-service.test-key.dead")
+
     @tackle_options = {
       :url => "amqp://localhost",
       :exchange => "test-exchange",
@@ -20,7 +23,7 @@ describe "Manual Ack Mode" do
 
         @messages << message
 
-        if message["value"].to_i.even?
+        if message.to_i.even?
           Tackle::ACK
         else
           Tackle::NACK
@@ -37,7 +40,7 @@ describe "Manual Ack Mode" do
 
   describe "acked messages" do
     before(:all) do
-      @messages = []
+      @messages.clear
 
       Tackle.publish("2", @tackle_options) # will be processed
 
@@ -59,9 +62,9 @@ describe "Manual Ack Mode" do
 
   describe "nacked messages" do
     before(:all) do
-      @messages = []
+      @messages.clear
 
-      Tackle.publish("3", @tackle_options) # will be processed
+      Tackle.publish("3", @tackle_options) # will not be processed
 
       sleep 5
     end
