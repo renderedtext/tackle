@@ -189,6 +189,9 @@ Tackle.consume(options) do |message|
 end
 ```
 
+If neither Tackle::ACK nor Tackle::NACK are returned, tackle assumes
+that the response is negative.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then,

@@ -11,6 +11,7 @@ module BunnyHelper
 
     queue = channel.queue(queue_name, {:durable => true})
     queue.delete
+  rescue Bunny::PreconditionFailed
   ensure
     conn.close
   end

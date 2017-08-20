@@ -23,6 +23,8 @@ describe "Manual Ack Mode" do
 
         @messages << message
 
+        return if message.to_i == 17 # return neither ack not nack
+
         if message.to_i.even?
           Tackle::ACK
         else
@@ -62,6 +64,8 @@ describe "Manual Ack Mode" do
 
   describe "nacked messages" do
     before(:all) do
+      @dead_messages_count = BunnyHelper.message_count("manual-acking-service.test-key.dead")
+
       @messages.clear
 
       Tackle.publish("3", @tackle_options) # will not be processed
@@ -78,7 +82,31 @@ describe "Manual Ack Mode" do
     end
 
     it "leaves the message in the dead queue" do
-      expect(BunnyHelper.message_count("manual-acking-service.test-key.dead")).to be(1)
+      expect(BunnyHelper.message_count("manual-acking-service.test-key.dead")).to be(@dead_messages_count + 1)
+    end
+  end
+
+  describe "no valid message response" do
+    before(:all) do
+      @dead_messages_count = BunnyHelper.message_count("manual-acking-service.test-key.dead")
+
+      @messages.clear
+
+      Tackle.publish("17", @tackle_options) # neither ack nor nack
+
+      sleep 5
+    end
+
+    it "processes the message multiple times" do
+      expect(@messages).to eq(["17", "17", "17", "17"])
+    end
+
+    it "cleares the queue" do
+      expect(BunnyHelper.message_count("manual-acking-service.test-key")).to be(0)
+    end
+
+    it "leaves the message in the dead queue" do
+      expect(BunnyHelper.message_count("manual-acking-service.test-key.dead")).to be(@dead_messages_count + 1)
     end
   end
 end
