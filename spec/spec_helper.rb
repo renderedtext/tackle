@@ -4,6 +4,18 @@ require "tackle"
 module BunnyHelper
   module_function
 
+  def delete_queue(queue_name)
+    conn = Bunny.new
+    conn.start
+    channel = conn.channel
+
+    queue = channel.queue(queue_name, {:durable => true})
+    queue.delete
+  rescue Bunny::PreconditionFailed
+  ensure
+    conn.close
+  end
+
   def queue_exists?(queue_name)
     conn = Bunny.new
     conn.start

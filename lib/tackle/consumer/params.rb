@@ -10,6 +10,7 @@ module Tackle
       attr_reader :retry_delay
       attr_reader :logger
       attr_reader :exception_handler
+      attr_reader :manual_ack
 
       def initialize(params = {})
         # required
@@ -22,8 +23,13 @@ module Tackle
         @retry_limit = params[:retry_limit] || 8
         @retry_delay = params[:retry_delay] || 30
         @logger      = params[:logger] || Logger.new(STDOUT)
+        @manual_ack  = params.fetch(:manual_ack, false)
 
         @exception_handler = params[:exception_handler]
+      end
+
+      def manual_ack?
+        @manual_ack == true
       end
 
     end

@@ -43,20 +43,28 @@ module Tackle
     def process_message(message, &block)
       message.log_info "Calling message processor"
 
-      block.call(message.payload)
+      response = block.call(message.payload)
 
-      message.ack
+      unless @params.manual_ack?
+        response = Tackle::ACK
+      end
+
+      case response
+      when Tackle::ACK
+        message.ack
+      when Tackle::NACK
+        redeliver_message(message, "Received Tackle::NACK")
+      else
+        raise "Response must be either Tackle::ACK or Tackle::NACK"
+      end
     rescue Exception => ex
-      message.log_error "Failed to process message. Received exception '#{ex}'"
-
-      redeliver_message(message)
-
-      message.nack
+      redeliver_message(message, "Received exception '#{ex}'")
 
       raise ex
     end
 
-    def redeliver_message(message)
+    def redeliver_message(message, reason)
+      message.log_error "Failed to process message. #{reason}"
       message.log_error "Retry count #{message.retry_count}/#{@params.retry_limit}"
 
       if message.retry_count < @params.retry_limit
@@ -64,6 +72,8 @@ module Tackle
       else
         @dead_queue.publish(message)
       end
+
+      message.nack
     end
 
   end

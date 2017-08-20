@@ -4,6 +4,10 @@ describe "Queue creation" do
   before(:all) do
     @messages = []
 
+    BunnyHelper.delete_queue("test-service.test-key")
+    BunnyHelper.delete_queue("test-service.test-key.delay.1")
+    BunnyHelper.delete_queue("test-service.test-key.dead")
+
     @tackle_options = {
       :url => "amqp://localhost",
       :exchange => "test-exchange",

@@ -132,6 +132,66 @@ Tackle.consume(options) do |message|
 end
 ```
 
+## Manually ack-ing messages
+
+By default, Tackle assumes that a message was successfully processed if no
+exceptions were raised in the consume block. This behaviour is well suited for
+handling unknown exceptions.
+
+Sometimes however, we want to send a message to the retry queue without raising
+an exception (and polluting our exception tracker with false positives).
+
+For this purpose, tackle can be configured to consume messages in a "manual ack"
+fashion. Pass `:manual_ack => true` to the consumer to activate the manual_ack
+mode.
+
+```ruby
+require "tackle"
+
+options = {
+  :url => "amqp://localhost",
+  :exchange => "users",
+  :routing_key => "signed-up",
+  :service => "user-mailer"
+  :manual_ack => true
+}
+
+Tackle.consume(options) do |message|
+  puts message
+
+  Tackle::ACK
+end
+```
+
+When Tackle consumes messages in the manual_ack mode, the return value of the
+consumer block must be either `Tackle::ACK` or `Tackle::NACK`. In case the
+response is `Tackle::NACK` the message is put on the retry queue.
+
+```ruby
+require "tackle"
+
+options = {
+  :url => "amqp://localhost",
+  :exchange => "numbers",
+  :routing_key => "positive-numbers",
+  :service => "number-processor",
+  :manual_ack => true
+}
+
+Tackle.consume(options) do |message|
+  # accept only positive numbers
+
+  if message["value"].even?
+    Tackle::ACK
+  else
+    Tackle::NACK
+  end
+end
+```
+
+If neither Tackle::ACK nor Tackle::NACK are returned, tackle assumes
+that the response is negative.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then,
