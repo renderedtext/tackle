@@ -14,7 +14,7 @@ describe "Manual Ack Mode" do
       :manual_ack => true
     }
 
-    @acking_worker = Thread.new do
+    @worker = Thread.new do
       Tackle.consume(@tackle_options) do |message|
         # accept only positive numbers
         @messages << message
@@ -35,14 +35,14 @@ describe "Manual Ack Mode" do
   end
 
   describe "acked messages" do
-    before do
+    before(:all) do
       Tackle.publish("2", @tackle_options) # will be processed
 
       sleep 5
     end
 
     it "processes the message only once" do
-      expect(@messages).to eq([2])
+      expect(@messages).to eq(["2"])
     end
 
     it "cleares the queue" do

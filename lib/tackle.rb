@@ -7,6 +7,9 @@ module Tackle
   require "tackle/publisher"
   require "tackle/consumer"
 
+  ACK = :ack
+  NACK = :nack
+
   module_function
 
   def consume(params = {}, &block)
