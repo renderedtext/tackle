@@ -19,7 +19,7 @@ module Tackle
       exchange.publish(message, :routing_key => @routing_key, :persistent => true)
       @logger.info("Publishing message finished exchange='#{@exchange_name}' routing_key='#{@routing_key}'")
     ensure
-      connection.close
+      connection.close unless connection.nil?
     end
 
   end

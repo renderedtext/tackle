@@ -23,6 +23,10 @@ module Tackle
       @channel.on_uncaught_exception(&@exception_handler)
 
       @logger.info("Connected to channel")
+    rescue Timeout::Error => ex
+      @logger.error("Timeout while connecting to RabbitMQ server message='#{ex}'")
+
+      raise ex
     rescue StandardError => ex
       @logger.error("Error while connecting to RabbitMQ message='#{ex}'")
 
