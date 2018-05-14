@@ -11,6 +11,7 @@ module Tackle
       attr_reader :logger
       attr_reader :exception_handler
       attr_reader :manual_ack
+      attr_reader :connection
 
       def initialize(params = {})
         # required
@@ -26,6 +27,8 @@ module Tackle
         @manual_ack  = params.fetch(:manual_ack, false)
 
         @exception_handler = params[:exception_handler]
+
+        @connection  = params.fetch(:connection, nil)
       end
 
       def manual_ack?

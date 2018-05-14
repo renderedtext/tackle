@@ -2,10 +2,11 @@ module Tackle
   class Connection
     attr_reader :channel
 
-    def initialize(amqp_url, exception_handler, logger)
+    def initialize(amqp_url, exception_handler, logger, connection = nil)
       @amqp_url = amqp_url
       @exception_handler = exception_handler
       @logger = logger
+      @connection = connection
 
       connect
     end
@@ -13,7 +14,7 @@ module Tackle
     def connect
       @logger.info("Connecting to RabbitMQ")
 
-      @connection = Bunny.new(@amqp_url)
+      @connection ||= Bunny.new(@amqp_url)
       @connection.start
 
       @logger.info("Connected to RabbitMQ")
