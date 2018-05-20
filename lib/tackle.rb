@@ -24,7 +24,8 @@ module Tackle
     exchange    = options.fetch(:exchange)
     routing_key = options.fetch(:routing_key)
     logger      = options.fetch(:logger, Logger.new(STDOUT))
+    connection  = options.fetch(:connection, nil)
 
-    Tackle::Publisher.new(url, exchange, routing_key, logger).publish(message)
+    Tackle::Publisher.new(url, exchange, routing_key, logger, connection).publish(message)
   end
 end

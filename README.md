@@ -192,6 +192,22 @@ end
 If neither Tackle::ACK nor Tackle::NACK are returned, tackle assumes
 that the response is negative.
 
+## Test
+
+To better performance in unit test put a instance mock of Bunny class in a
+connection key at options, for example, you could use a gem bunny-mock.
+
+```ruby
+
+options = {
+  :url => "amqp://localhost",
+  ...
+  :connection => BunnyMock.new
+  ...
+}
+
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then,

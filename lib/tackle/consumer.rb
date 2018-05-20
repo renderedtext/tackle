@@ -18,7 +18,7 @@ module Tackle
     end
 
     def setup_rabbit_connections
-      @connection = Tackle::Connection.new(@params.amqp_url, @params.exception_handler, @logger)
+      @connection = Tackle::Connection.new(@params.amqp_url, @params.exception_handler, @logger, @params.connection)
 
       @exchange    = Exchange.new(@params.service, @params.routing_key, @connection, @logger)
       @main_queue  = MainQueue.new(@exchange, @connection, @logger)

@@ -1,15 +1,16 @@
 module Tackle
   class Publisher
 
-    def initialize(url, exchange_name, routing_key, logger)
+    def initialize(url, exchange_name, routing_key, logger, connection = nil)
       @url = url
       @exchange_name = exchange_name
       @routing_key = routing_key
       @logger = logger
+      @connection = connection
     end
 
     def publish(message)
-      connection = Tackle::Connection.new(@url, nil, @logger)
+      connection = Tackle::Connection.new(@url, nil, @logger, @connection)
 
       @logger.info("Declaring exchange='#{@exchange_name}'")
       exchange = connection.channel.direct(@exchange_name, :durable => true)
