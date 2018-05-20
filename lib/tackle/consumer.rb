@@ -7,6 +7,7 @@ module Tackle
   require_relative "consumer/main_queue"
   require_relative "consumer/delay_queue"
   require_relative "consumer/dead_queue"
+  require_relative "consumer/active_record_connection_reaper"
 
   class Consumer
 
@@ -41,26 +42,30 @@ module Tackle
     end
 
     def process_message(message, &block)
-      message.log_info "Calling message processor"
+      Tackle::Consumer::ActiveRecordConnectionReaper.run do
+        begin
+          message.log_info "Calling message processor"
 
-      response = block.call(message.payload)
+          response = block.call(message.payload)
 
-      unless @params.manual_ack?
-        response = Tackle::ACK
+          unless @params.manual_ack?
+            response = Tackle::ACK
+          end
+
+          case response
+          when Tackle::ACK
+            message.ack
+          when Tackle::NACK
+            redeliver_message(message, "Received Tackle::NACK")
+          else
+            raise "Response must be either Tackle::ACK or Tackle::NACK"
+          end
+        rescue Exception => ex
+          redeliver_message(message, "Received exception '#{ex}'")
+
+          raise ex
+        end
       end
-
-      case response
-      when Tackle::ACK
-        message.ack
-      when Tackle::NACK
-        redeliver_message(message, "Received Tackle::NACK")
-      else
-        raise "Response must be either Tackle::ACK or Tackle::NACK"
-      end
-    rescue Exception => ex
-      redeliver_message(message, "Received exception '#{ex}'")
-
-      raise ex
     end
 
     def redeliver_message(message, reason)
