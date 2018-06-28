@@ -1,0 +1,42 @@
+
+version: "v3.0"
+name: My first pipeline
+semaphore_image: standard
+blocks:
+  - name: "Stage 1"
+    build:
+      prologue:
+        commands:
+          - checkout && cd $SEMAPHORE_GIT_DIR
+      epilogue:
+        commands:
+          - echo "Yay job finished"
+          - echo $SEMAPHORE_JOB_RESULT
+      env_vars:
+        - name: VAR1
+          value: Environment Variable 1
+        - name: PI
+          value: "3.14159"
+      jobs:
+      - name: Just ls
+        commands:
+          - pwd
+          - echo "test"
+          - ls /etc
+
+      - name: List files
+        commands:
+          - echo "First env var -> $VAR1"
+          - echo "My files:"
+          - ls -lah
+
+  - name: "Stage 2"
+    build:
+      jobs:
+      - name: Echo job
+        commands:
+          - checkout
+          - cd $SEMAPHORE_GIT_DIR
+          - pwd
+          - echo $SEMAPHORE_PIPELINE_ID
+          - echo "Hello from $SEMAPHORE_JOB_ID"
