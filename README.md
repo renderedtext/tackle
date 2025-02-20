@@ -98,7 +98,7 @@ require "tackle"
 options = {
   :url => "amqp://localhost",
   :exchange => "users",
-  :routing_key => "signed-up"
+  :routing_key => "signed-up",
   :service => "user-mailer",
   :retry_limit => 8,
   :retry_delay => 30,
@@ -119,7 +119,7 @@ require "tackle"
 options = {
   :url => "amqp://localhost",
   :exchange => "users",
-  :routing_key => "signed-up"
+  :routing_key => "signed-up",
   :service => "user-mailer",
   :retry_limit => 8,
   :retry_delay => 30,
@@ -152,7 +152,7 @@ options = {
   :url => "amqp://localhost",
   :exchange => "users",
   :routing_key => "signed-up",
-  :service => "user-mailer"
+  :service => "user-mailer",
   :manual_ack => true
 }
 
@@ -224,3 +224,7 @@ to [rubygems.org](https://rubygems.org).
 
 Bug reports and pull requests are welcome on GitHub at
 https://github.com/renderedtext/tackle.
+
+## License
+
+This software is licensed under [the Apache 2.0 license](LICENSE).

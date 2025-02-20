@@ -53,7 +53,7 @@ describe "Manual Ack Mode" do
       expect(@messages).to eq(["2"])
     end
 
-    it "cleares the queue" do
+    it "clears the queue" do
       expect(BunnyHelper.message_count("manual-acking-service.test-key")).to be(0)
     end
 
@@ -77,7 +77,7 @@ describe "Manual Ack Mode" do
       expect(@messages).to eq(["3", "3", "3", "3"])
     end
 
-    it "cleares the queue" do
+    it "clears the queue" do
       expect(BunnyHelper.message_count("manual-acking-service.test-key")).to be(0)
     end
 
@@ -101,7 +101,7 @@ describe "Manual Ack Mode" do
       expect(@messages).to eq(["17", "17", "17", "17"])
     end
 
-    it "cleares the queue" do
+    it "clears the queue" do
       expect(BunnyHelper.message_count("manual-acking-service.test-key")).to be(0)
     end
 
