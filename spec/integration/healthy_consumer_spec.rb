@@ -35,7 +35,7 @@ describe "Healthy Consumers" do
       expect(@messages).to eq(["Hi!"])
     end
 
-    it "cleares the queue" do
+    it "clears the queue" do
       expect(BunnyHelper.message_count("healthy-service.test-key")).to be(0)
     end
 
